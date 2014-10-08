@@ -1,4 +1,5 @@
 # REPLME
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/replme/replme-frontend?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [REPLME](http://replme.clojurecup.com) is a project aimed at making
 it easy to try out Clojure software by providing a containerized 
 environment to download libraries and run them.
