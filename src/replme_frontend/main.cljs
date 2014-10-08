@@ -1,11 +1,11 @@
-(ns replme.cljs.main
+(ns replme-frontend.main
   (:use [jayq.core :only [document-ready]])
-  (:require [replme.cljs.repo-input :as repo-input]
-            [replme.cljs.repl :as repl]
-            [replme.cljs.loading-message :as loading-message]
-            [replme.cljs.websocket :as ws]
-            [replme.cljs.about-page :as about-page]
-            [replme.cljs.readme-section :as readme]
+  (:require [replme-frontend.repo-input :as repo-input]
+            [replme-frontend.repl :as repl]
+            [replme-frontend.loading-message :as loading-message]
+            [replme-frontend.websocket :as ws]
+            [replme-frontend.about-page :as about-page]
+            [replme-frontend.readme-section :as readme]
             [cljs.core.async :refer [<! chan close!]])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
 

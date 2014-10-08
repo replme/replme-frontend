@@ -1,4 +1,4 @@
-(ns replme.cljs.websocket
+(ns replme-frontend.websocket
   (:require [cljs.core.async :refer [>! chan pub]]
             [cljs.reader :as reader])
   (:require-macros [cljs.core.async.macros :refer [go]]))

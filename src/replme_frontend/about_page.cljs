@@ -1,4 +1,4 @@
-(ns replme.cljs.about-page
+(ns replme-frontend.about-page
   (:use [jayq.core :only [$ on fade-in fade-out]]))
 
 (defn init []

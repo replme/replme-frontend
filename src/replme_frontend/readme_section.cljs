@@ -1,4 +1,4 @@
-(ns replme.cljs.readme-section
+(ns replme-frontend.readme-section
   (:use [jayq.core :only [$ on find fade-in html slide-up ajax done remove-class add-class]])
   (:require [goog.crypt.base64 :as b64]
             [markdown.core :refer [md->html]]

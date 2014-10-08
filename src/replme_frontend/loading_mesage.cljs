@@ -1,6 +1,6 @@
-(ns replme.cljs.loading-message
+(ns replme-frontend.loading-message
   (:require [cljs.core.async :refer [<! >! chan sub]]
-            [replme.cljs.websocket :as ws])
+            [replme-frontend.websocket :as ws])
   (:use [jayq.core :only [$ fade-out on append slide-down slide-up prop anim]])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
 

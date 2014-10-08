@@ -1,6 +1,6 @@
-(ns replme.cljs.repl
+(ns replme-frontend.repl
   (:require [cljs.core.async :refer [<! >! sub chan]]
-            [replme.cljs.websocket :as ws])
+            [replme-frontend.websocket :as ws])
   (:use [jayq.core :only [$ empty text]])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
 

@@ -1,4 +1,4 @@
-(ns replme.cljs.repo-input
+(ns replme-frontend.repo-input
   (:use [jayq.core :only [$ on val]])
   (:require [cljs.core.async :refer [>!]])
   (:require-macros [cljs.core.async.macros :refer [go]]))
