@@ -7,6 +7,7 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
+/resources/public/out
 /resources/public/out/**/*
 /.vagrant
 resources/public/replme.js

@@ -22,13 +22,6 @@ body {
     font-family: 'Ubuntu Mono', sans-serif
 }
 
-#vote-for-us {
-    right: 0px;
-    top: 0px;
-    position: absolute;
-    height: 80px;
-}
-
 #site-title-container {
     margin: 0;
     float: left;
