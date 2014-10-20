@@ -1,0 +1,46 @@
+/* mini css reset */
+
+html, body, div, form, fieldset, legend, label {
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6, th, td, caption {
+    font-weight: normal;
+    margin: 0;
+}
+
+a, a:visited {
+    color: rgb(0, 204, 255);
+}
+
+img { border: 0; }
+
+body {
+    background-color: rgba(0,0,0,0.1);
+    font-family: 'Ubuntu Mono', sans-serif
+}
+
+.navigation {
+    background: #fff
+}
+
+.repl {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+}
+
+.repl-cursor {
+    background: rgb(0, 204, 255);
+}
+
+.site-logo {
+    width: 150px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.repo-input {
+    font-size: 18px;
+    vertical-align: middle;
+}
