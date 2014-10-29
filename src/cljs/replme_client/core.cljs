@@ -7,15 +7,18 @@
 
 (enable-console-print!)
 
+;; TODO: remove event listener on compoment teardown...
+;; use contains keys keymap for preventdefault
+
 (defonce app-state (atom {:text "Hello Chestnut!"
                           :github-repo ""
                           :repl [{:input "(+ 1 2 3)" :output "6"}
                                  {:input "(/ 10 2)" :output "5"}]}))
 
-(def key-map {37 :left
-              39 :right
-              38 :up
-              8  :delete})
+(def move-keys {37 :left
+                39 :right
+                38 :up
+                8  :delete})
 
 (defn repl
   "Om component for new repl"
@@ -27,12 +30,19 @@
         (.addEventListener js/window "keydown"
                            (fn [e]
                              (let [key-code (.-which e)]
-                               (when (= (key-map key-code) :delete) (.preventDefault e))
+                               (when (some #{key-code} (keys move-keys))
+                                 (.preventDefault e)
+                                 (put! key-chan key-code)))))
+
+        (.addEventListener js/window "keypress"
+                           (fn [e]
+                             (let [key-code (.-which e)]
                                (put! key-chan key-code))))
+
         (go-loop [key (<! key-chan)]
                  (let [pre-input (om/get-state owner :pre-input)
                        post-input (om/get-state owner :post-input)]
-                   (case (key-map key) ;; TODO: move these to separate handlers
+                   (case (move-keys key) ;; TODO: move these to separate handlers
                      :left ((om/set-state! owner :pre-input
                                            (drop-last pre-input))
                             (om/set-state! owner :post-input
@@ -42,18 +52,18 @@
                              (om/set-state! owner :pre-input
                                             (concat pre-input (first post-input))))
                      :delete (om/set-state! owner :pre-input
-                                            (drop-last (om/get-state owner :pre-input)))
+                                            (drop-last pre-input))
                      :up (.log js/console "implement history here")
 
-                     (om/set-state! owner :pre-input ;; TODO: why are all the letters uppercased???
-                                                     ;; (.fromCharCode js/String key) the same...
+                     (om/set-state! owner :pre-input
                                     (concat pre-input (str/split (char key) "")))))
                  (recur (<! key-chan)))))
+
     om/IInitState
     (init-state [this]
       {:focus true
-       :pre-input ["c" "o" "d" "e" "." "." "."]
-       :post-input ["a" "f" "t" "e" "r"]
+       :pre-input []
+       :post-input []
        :key-chan (chan)})
     om/IRenderState
     (render-state [_ state]
