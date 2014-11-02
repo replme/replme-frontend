@@ -35,6 +35,10 @@ body {
     position: absolute;
 }
 
+.namespace {
+    margin-right: 5px
+}
+
 .site-logo {
     width: 150px;
     vertical-align: middle;

@@ -8,10 +8,9 @@
 (enable-console-print!)
 
 ;; TODO: remove event listener on compoment teardown...
-;; use contains keys keymap for preventdefault
 
-(defonce app-state (atom {:text "Hello Chestnut!"
-                          :github-repo ""
+(defonce app-state (atom {:github-repo ""
+                          :namespace "user"
                           :repl [{:input "(+ 1 2 3)" :output "6"}
                                  {:input "(/ 10 2)" :output "5"}]}))
 
@@ -69,6 +68,8 @@
     (render-state [_ state]
       (dom/div
        #js {:className "repl"}
+       (dom/span #js {:className "namespace"}
+                 (str (:namespace data) "=>"))
        (dom/span #js {:className "pre-input"}
                  (apply str (:pre-input state)))
        (dom/span #js {:className "repl-cursor"
