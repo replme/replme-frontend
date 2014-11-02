@@ -7,17 +7,36 @@
 
 (enable-console-print!)
 
-;; TODO: remove event listener on compoment teardown...
+;; TODO:
+;; refactor the repl component and break apart pure fns
+;; remove event listeners on compoment teardown
+;; handle whitespace with html symbol "&#160"
 
-(defonce app-state (atom {:github-repo ""
-                          :namespace "user"
-                          :repl [{:input "(+ 1 2 3)" :output "6"}
-                                 {:input "(/ 10 2)" :output "5"}]}))
+(def app-state (atom {:github-repo ""
+                      :namespace "user"
+                      :repl [{:input "(+ 1 2 3)" :output "6"}
+                             {:input "(/ 10 2)" :output "5"}]}))
 
 (def move-keys {37 :left
                 39 :right
                 38 :up
-                8  :delete})
+                8  :delete
+                32 :space ; &#160
+                13 :enter})
+
+(defn repl-log
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (println (:input data)))
+    om/IRender
+    (render [_]
+      (dom/div nil
+               (dom/p #js {:className "repl-log-input"}
+                      (:input data))
+               (dom/p #js {:className "repl-log-output"}
+                      (:output data))))))
 
 (defn repl
   "Om component for new repl"
@@ -46,12 +65,22 @@
                                            (drop-last pre-input))
                             (om/set-state! owner :post-input
                                            (cons (last pre-input) post-input)))
+
                      :right ((om/set-state! owner :post-input
                                             (rest post-input))
                              (om/set-state! owner :pre-input
                                             (concat pre-input (first post-input))))
+
                      :delete (om/set-state! owner :pre-input
                                             (drop-last pre-input))
+
+                     :enter (let [code-to-eval (apply str (concat pre-input post-input))]
+                              (om/transact! data :repl
+                                            #(conj % {:input code-to-eval
+                                                      :output "^^^ eval that here"}))
+                              (om/set-state! owner :pre-input nil)
+                              (om/set-state! owner :post-input nil))
+
                      :up (.log js/console "implement history here")
 
                      (om/set-state! owner :pre-input
@@ -111,13 +140,15 @@
 
 (defn main []
   (om/root
-   (fn [app owner]
+   (fn [data owner]
      (reify
        om/IRender
        (render [_]
          (dom/div nil
-                  (om/build top-nav app)
-                  (om/build repl app)))))
+                  (om/build top-nav data)
+                  (apply dom/div nil
+                         (om/build-all repl-log (:repl data)))
+                  (om/build repl data)))))
    app-state
    {:target (. js/document (getElementById "app"))}))
 
