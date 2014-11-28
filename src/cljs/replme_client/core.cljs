@@ -47,7 +47,8 @@
         (.addEventListener js/window "keydown"
                            (fn [e]
                              (let [key-code (.-which e)]
-                               (when (some #{key-code} (keys move-keys))
+                               (when (and (some #{key-code} (keys move-keys))
+                                          (om/get-state owner :focus))
                                  (.preventDefault e)
                                  (put! key-chan key-code)))))
 
@@ -56,39 +57,47 @@
                              (let [key-code (.-which e)]
                                (put! key-chan key-code))))
 
+        (.addEventListener js/window "click"
+                           (fn [e]
+                             (let [target (.-target e)]
+                               (om/set-state! owner :focus (= (.-className target) "repl")))))
+
         (go-loop [key (<! key-chan)]
                  (let [pre-input (om/get-state owner :pre-input)
-                       post-input (om/get-state owner :post-input)]
-                   (case (move-keys key) ;; TODO: move these to separate handlers
-                     :left ((om/set-state! owner :pre-input
-                                           (drop-last pre-input))
-                            (om/set-state! owner :post-input
-                                           (cons (last pre-input) post-input)))
+                       post-input (om/get-state owner :post-input)
+                       focus (om/get-state owner :focus)]
 
-                     :right ((om/set-state! owner :post-input
-                                            (rest post-input))
-                             (om/set-state! owner :pre-input
-                                            (concat pre-input (first post-input))))
+                   (when focus
+                     (case (move-keys key) ;; TODO: move these to separate handlers
+                       :left ((om/set-state! owner :pre-input
+                                             (drop-last pre-input))
+                              (om/set-state! owner :post-input
+                                             (cons (last pre-input) post-input)))
 
-                     :delete (om/set-state! owner :pre-input
-                                            (drop-last pre-input))
+                       :right ((om/set-state! owner :post-input
+                                              (rest post-input))
+                               (om/set-state! owner :pre-input
+                                              (concat pre-input (first post-input))))
 
-                     :enter (let [code-to-eval (apply str (concat pre-input post-input))]
-                              (om/transact! data :repl
-                                            #(conj % {:input code-to-eval
-                                                      :output "^^^ eval that here"}))
-                              (om/set-state! owner :pre-input nil)
-                              (om/set-state! owner :post-input nil))
+                       :delete (om/set-state! owner :pre-input
+                                              (drop-last pre-input))
 
-                     :up (.log js/console "implement history here")
+                       :enter (let [code-to-eval (apply str (concat pre-input post-input))]
+                                (om/transact! data :repl
+                                              #(conj % {:input code-to-eval
+                                                        :output "^^^ eval that here"}))
+                                (om/set-state! owner :pre-input nil)
+                                (om/set-state! owner :post-input nil))
 
-                     (om/set-state! owner :pre-input
-                                    (concat pre-input (str/split (char key) "")))))
+                       :up (.log js/console "implement history here")
+
+                       (om/set-state! owner :pre-input
+                                      (concat pre-input (str/split (char key) ""))))))
                  (recur (<! key-chan)))))
 
     om/IInitState
     (init-state [this]
-      {:focus true
+      {:focus false
        :pre-input []
        :post-input []
        :key-chan (chan)})
