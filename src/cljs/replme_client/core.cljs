@@ -10,7 +10,6 @@
 ;; TODO:
 ;; refactor the repl component and break apart pure fns
 ;; remove event listeners on compoment teardown
-;; handle whitespace with html symbol "&#160"
 
 (def app-state (atom {:github-repo ""
                       :namespace "user"
@@ -21,7 +20,7 @@
                 39 :right
                 38 :up
                 8  :delete
-                32 :space ; &#160
+                32 :space
                 13 :enter})
 
 (defn repl-log
@@ -93,10 +92,11 @@
        :pre-input []
        :post-input []
        :key-chan (chan)})
+
     om/IRenderState
     (render-state [_ state]
       (dom/div
-       #js {:className "repl"}
+       #js {:className "repl" :style #js {:whiteSpace "pre"}}
        (dom/span #js {:className "namespace"}
                  (str (:namespace data) "=>"))
        (dom/span #js {:className "pre-input"}
