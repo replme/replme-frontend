@@ -63,43 +63,40 @@
                                (om/set-state! owner :focus (= (.-className target) "repl")))))
 
         (go-loop [key (<! key-chan)]
-                 (let [pre-input (om/get-state owner :pre-input)
-                       post-input (om/get-state owner :post-input)
+                 (let [{:keys [pre post]} (om/get-state owner :input)
                        focus (om/get-state owner :focus)]
 
                    (when focus
                      (case (move-keys key) ;; TODO: move these to separate handlers
-                       :left ((om/set-state! owner :pre-input
-                                             (drop-last pre-input))
-                              (om/set-state! owner :post-input
-                                             (cons (last pre-input) post-input)))
+                       :left (om/set-state! owner :input
+                                             {:pre  (drop-last pre)
+                                              :post (cons (last pre) post)})
 
-                       :right ((om/set-state! owner :post-input
-                                              (rest post-input))
-                               (om/set-state! owner :pre-input
-                                              (concat pre-input (first post-input))))
+                       :right (om/set-state! owner :input
+                                              {:pre (concat pre (first post))
+                                               :post (rest post)})
 
-                       :delete (om/set-state! owner :pre-input
-                                              (drop-last pre-input))
+                       :delete (om/set-state! owner :input
+                                              {:pre (drop-last pre)
+                                               :post post})
 
-                       :enter (let [code-to-eval (apply str (concat pre-input post-input))]
+                       :enter (let [code-to-eval (apply str (concat pre post))]
                                 (om/transact! data :repl
                                               #(conj % {:input code-to-eval
                                                         :output "^^^ eval that here"}))
-                                (om/set-state! owner :pre-input nil)
-                                (om/set-state! owner :post-input nil))
+                                (om/set-state! owner :input {:pre nil :post nil}))
 
                        :up (.log js/console "implement history here")
 
-                       (om/set-state! owner :pre-input
-                                      (concat pre-input (str/split (char key) ""))))))
+                       (om/set-state! owner :input
+                                      {:pre (concat pre (char key))
+                                       :post post}))))
                  (recur (<! key-chan)))))
 
     om/IInitState
     (init-state [this]
       {:focus false
-       :pre-input []
-       :post-input []
+       :input {:pre [] :post []}
        :key-chan (chan)})
 
     om/IRenderState
@@ -109,11 +106,11 @@
        (dom/span #js {:className "namespace"}
                  (str (:namespace data) "=>"))
        (dom/span #js {:className "pre-input"}
-                 (apply str (:pre-input state)))
+                 (apply str (:pre (:input state))))
        (dom/span #js {:className "repl-cursor"
                       :dangerouslySetInnerHTML #js {:__html "&nbsp;"}})
        (dom/span #js {:className "post-input"}
-                 (apply str (:post-input state)))))))
+                 (apply str (:post (:input state))))))))
 
 (defn site-logo
   "Om component for new site-logo"
